@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pondicherry University - Complaint Management System</title>
+    <link rel="stylesheet" href="styles.css">
+     <!-- Add EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // Initialize EmailJS with your Public Key
+        emailjs.init("eZyaR_iFcnoxXi04a"); // Replace with your actual public key
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-circle">
+                    <img src="university_logo.png" alt="Pondicherry University Logo">
+                </div>
+                <div class="logo-text">
+                    <h1>Pondicherry University</h1>
+                    <p>Complaint Management System</p>
+                </div>
+            </div>
+            <div class="auth-buttons">
+                <a href="complain.html" class="btn btn-outline">Go to Complain</a>
+                <a href="track.html" class="btn btn-primary">Track your Complain</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Pondicherry University Complaint Management System</h2>
+            <p>Empowering students, faculty, and staff to report issues, share feedback, and collaborate with university administration for a better campus experience.</p>
+
+ <a href="admin.html" 
+   style="display: inline-flex; align-items: center; gap: 8px; background: #2E86AB; color: white; text-decoration: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; transition: all 0.3s;"
+   onmouseover="this.style.background='#1B6FB3'; this.style.transform='translateY(-2px)'" 
+   onmouseout="this.style.background='#2E86AB'; this.style.transform='translateY(0)'">
+    🔐 Admin Login
+</a>
+        </div>
+    </section>
+
+<!-- Update your forms section structure -->
+<section id="formsSection" style="display: none;">
+    <!-- Report Form -->
+    <div id="reportForm">
+        <form id="complaintForm">
+            <!-- Your existing complaint form fields -->
+        </form>
+    </div>
+    
+    <!-- Track Form -->
+    <div id="trackForm" style="display: none;">
+        <input type="text" id="trackId" placeholder="Paste Complaint ID">
+        <button id="trackBtn" class="btn btn-primary">Check Status</button>
+        <div id="trackResult" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;"></div>
+    </div>
+</section>
+
+    <!-- Main Content -->
+    <section class="main-content">
+        <div class="container">
+            <div class="section-title">
+                <h3>Pondicherry University Complaint Management System</h3>
+                <p>Powered by University Administration</p>
+            </div>
+            
+            <div class="description-box">
+                <p>Pondicherry University Complaint Management System is a comprehensive solution that empowers students, faculty, and staff to report issues, identify maintenance needs, share feedback, and ask questions of university administration. For university officials, it powers efficient and transparent workflows, fostering accountability and trust. The result is collaborative experiences between the university community and administration that co-create clean, safe, and well-maintained campus environments.</p>
+            </div>
+            
+            
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h3>How It Works</h3>
+                <p>Simple steps to report and resolve campus issues</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Report an Issue</h4>
+                    <p>Easily report maintenance issues, facility problems, or other concerns using our simple form.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h4>Track Progress</h4>
+                    <p>Monitor the status of your reported issues in real-time with our tracking system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>Get Resolved</h4>
+                    <p>Receive notifications when your issues are resolved and provide feedback on the process.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>Pondicherry University</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Campus Map</a></li>
+                        <li><a href="#">Administration</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Complaint System</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Pondicherry University, Kalapet, Pondicherry</a></li>
+                        <li><a href="#">complaints@pondiuni.edu.in</a></li>
+                        <li><a href="#">+91 (413) 2655179</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Pondicherry University. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script1.js"></script>
+</body>
+</html>

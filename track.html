@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Track Complaint - Pondicherry University</title>
+  <link rel="stylesheet" href="style1.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img src="university_logo.png" alt="University Logo" class="logo"/>
+    <div>
+      <h1>Track Your Complaint</h1>
+      <p class="subtitle">Check the status of your submitted complaints</p>
+    </div>
+  </header>
+
+  <div class="nav-buttons">
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+
+  <main class="container">
+    <section class="card">
+      <h2>Track Report</h2>
+      <p>Enter your Report ID to check status</p>
+      <input id="trackId" placeholder="Paste Report ID" style="margin: 10px 0;" />
+      <button id="trackBtn" class="btn-primary">Check Status</button>
+      <div id="trackResult" class="result hidden" style="margin-top:12px;"></div>
+    </section>
+
+    <aside class="card side">
+      <h3>Need Help?</h3>
+      <ul class="small-list">
+        <li>Find your Report ID in the confirmation email</li>
+        <li>Contact admin if you lost your Report ID</li>
+        <li>Typical resolution time: 3-5 working days</li>
+        <li>High priority issues are addressed first</li>
+      </ul>
+      
+      <div style="margin-top: 20px;">
+        <a href="complain.html" class="btn-light">Submit New Complaint</a>
+      </div>
+    </aside>
+  </main>
+
+  
+  <script src="script.js"></script>
+  <script src="track.js"></script>
+</body>
+</html>

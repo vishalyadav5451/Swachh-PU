@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Submit Complaint - Pondicherry University</title>
+  <link rel="stylesheet" href="style1.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img src="university_logo.png" alt="University Logo" class="logo"/>
+    <div>
+      <h1>Submit a Complaint</h1>
+      <p class="subtitle">Report garbage, fallen wires, water leakage or other issues</p>
+    </div>
+  </header>
+
+  <div class="nav-buttons">
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+
+  <main class="container">
+    <section class="card">
+      <h2>Submit a Report</h2>
+
+      <form id="reportForm" autocomplete="off">
+        <div class="row">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" />
+        </div>
+
+        <div class="row horizontal">
+          <div style="flex:1">
+            <label for="regno">Reg No (optional)</label>
+            <input id="regno" name="regno" type="text" placeholder="e.g. MCA123" />
+          </div>
+          <div style="flex:1; margin-left:12px;">
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="">-- Select problem type --</option>
+            <option value="Garbage">🗑 Garbage</option>
+            <option value="Electrical">⚡ Electrical Issue</option>
+            <option value="Water">💧 Water Leakage</option>
+            <option value="Infrastructure">🏫 Infrastructure</option>
+            <option value="Other">🔧 Other</option>
+          </select>
+        </div>
+
+        <div class="row horizontal">
+          <div style="flex:1">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority" required>
+              <option value="">-- Priority --</option>
+              <option value="High">🚨 High (Urgent)</option>
+              <option value="Medium">⚠ Medium</option>
+              <option value="Low">⏳ Low</option>
+            </select>
+          </div>
+          <div style="flex:1;margin-left:12px;">
+            <label>&nbsp;</label>
+            <div class="checkbox-row">
+              <input id="anonymous" type="checkbox" />
+              <label for="anonymous" class="inline">Report Anonymously</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="manualLocation">Location (manual)</label>
+          <input id="manualLocation" type="text" placeholder="e.g., Hostel Block A, Library side" />
+        </div>
+
+       
+        <div class="row horizontal">
+          <div style="flex:1;">
+            <label>&nbsp;</label>
+            <button type="button" id="gpsBtn" class="btn-light">📍 Use Current Location</button>
+          </div>
+          <div style="flex:1; margin-left:12px;">
+            <label>&nbsp;</label>
+            <input id="latlon" type="text" readonly placeholder="Lat, Lon will appear here" />
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" placeholder="Describe the issue..." required></textarea>
+        </div>
+
+         <div class="form-group">
+    <label for="photo">Upload Photo (Optional):</label>
+    <input type="file" id="photo" name="photo" accept="image/*" capture="environment">
+    <small>Supported formats: JPG, PNG, GIF (Max 5MB)</small>
+</div>
+
+
+        <div class="row">
+          <button id="submitBtn" type="submit" class="btn-primary">Submit Report</button>
+        </div>
+      </form>
+
+      <div id="resultBox" class="result hidden"></div>
+    </section>
+
+    <aside class="card side">
+      <h3>Tips</h3>
+      <ul class="small-list">
+        <li>Use current location for accurate mapping.</li>
+        <li>Set priority correctly — it helps admin respond faster.</li>
+        <li>If you prefer, submit anonymously.</li>
+        <li>Add photos to help understand the issue better.</li>
+      </ul>
+      
+      <div style="margin-top: 20px;">
+        <a href="track.html" class="btn-light">Track Existing Complaint</a>
+      </div>
+    </aside>
+  </main>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script src="script.js"></script>
+  <script src="complain.js"></script>
+</body>
+</html>
