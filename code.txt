@@ -1,0 +1,293 @@
+// =============================
+// UNIVERSITY COMPLAINT SYSTEM
+// FINAL STABLE BACKEND (CORS FIXED)
+// =============================
+
+// === CONFIG ===
+const DRIVE_FOLDER_NAME = "Swachh PU Complaint Photos";
+const PHOTO_URL_BASE = "https://drive.google.com/uc?id=";
+
+// === UNIVERSAL SAFE RESPONSE ===
+function sendResponse(data) {
+  const json = JSON.stringify(data);
+  const output = ContentService.createTextOutput(json);
+  output.setMimeType(ContentService.MimeType.JSON);
+
+  // ✅ Add CORS headers (works for fetch requests)
+  try {
+    output.setHeader("Access-Control-Allow-Origin", "*");
+    output.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    output.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  } catch (err) {
+    Logger.log("⚠️ Could not set CORS headers: " + err.message);
+  }
+
+  return output;
+}
+
+
+
+
+// === OPTIONS handler (preflight CORS) ===
+function doOptions(e) {
+  return ContentService
+    .createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+
+// === POST - complaint submission ===
+function doPost(e) {
+  try {
+    if (!e) throw new Error("No data received");
+    
+    // ✅ PROPERLY detect photo upload requests
+    const params = e.parameter || {};
+    
+    // Check if this is a photo upload request
+    if (params.action === "uploadPhoto" || params.photoOnly === "true") {
+      return handlePhotoUpload(e);
+    }
+    
+    // Check FormData for photo upload action
+    if (e.postData && e.postData.type === "multipart/form-data") {
+      const formData = parseFormData(e.postData.contents);
+      if (formData.action === "uploadPhoto" || formData.photoOnly === "true") {
+        return handlePhotoUpload(e);
+      }
+    }
+
+    // ✅ Only process as complaint if none of the above photo conditions are met
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    // Add headers if empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp", "Name", "Email", "RegNo", "Category", "Complaint",
+        "Status", "Priority", "ComplaintID", "Manual Location",
+        "GPS Coordinates", "Photo URL"
+      ]);
+    }
+
+    let data = {};
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch {
+        data = parseFormData(e.postData.contents);
+      }
+    } else if (e.parameter) {
+      data = e.parameter;
+    }
+
+    const id = "PU" + String(sheet.getLastRow()).padStart(4, "0");
+    const row = [
+      new Date(),
+      data.name || "Anonymous",
+      data.email || "",
+      data.regno || data.regNo || "",
+      data.category || "General",
+      data.complaint || data.description || "",
+      "Pending",
+      data.priority || "Medium",
+      id,
+      data.location || "",
+      data.coordinates || "",
+      data.photoUrl || ""
+    ];
+
+    sheet.appendRow(row);
+
+    return sendResponse({
+      status: "success",
+      message: "Complaint submitted successfully",
+      complaintId: id
+    });
+  } catch (err) {
+    return sendResponse({ status: "error", message: err.message });
+  }
+}
+
+// === GET - fetch or update ===
+function doGet(e) {
+  let responseData = {};
+
+  try {
+    if (!e) {
+      responseData = { status: "ok", message: "API online" };
+    } else {
+      const p = e.parameter;
+      const complaintId = p.id || p.complaintId;
+
+      if (p.action === "notifyUser" && p.email) {
+        responseData = sendNotificationEmail(
+          p.email,
+          p.name,
+          p.complaintId,
+          p.status,
+          p.notes || ""
+        );
+      } else if (p.updateAction === "status" && complaintId) {
+        responseData = updateStatus(complaintId, p.newStatus);
+      } else if (p.action === "getAll") {
+        responseData = getAll();
+      } else if (complaintId) {
+        responseData = getById(complaintId);
+      } else {
+        responseData = { status: "ok", message: "Complaint API Ready" };
+      }
+    }
+  } catch (err) {
+    responseData = { status: "error", message: err.message };
+  }
+
+  // ✅ Send JSON response with CORS headers
+  return ContentService
+    .createTextOutput(JSON.stringify(responseData))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+
+
+// === UPDATE STATUS ===
+function updateStatus(id, newStatus) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const idCol = headers.indexOf("ComplaintID");
+  const statusCol = headers.indexOf("Status");
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][idCol] === id) {
+      sheet.getRange(i + 1, statusCol + 1).setValue(newStatus);
+      return { status: "success", message: "Status updated", complaintId: id };
+    }
+  }
+
+  return { status: "error", message: "Complaint ID not found" };
+}
+
+// === FETCH ALL ===
+function getAll() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return { status: "success", data: [] };
+
+  const headers = data[0];
+  const out = data.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => (obj[h] = r[i]));
+    return obj;
+  });
+
+  return { status: "success", data: out };
+}
+
+// === FETCH BY ID ===
+function getById(id) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const idCol = headers.indexOf("ComplaintID");
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][idCol] === id) {
+      const obj = {};
+      headers.forEach((h, j) => (obj[h] = data[i][j]));
+      return { status: "success", data: obj };
+    }
+  }
+
+  return { status: "error", message: "Complaint not found" };
+}
+
+// === PHOTO UPLOAD ===
+// === FIXED PHOTO UPLOAD (no sheet row created) ===
+// function handlePhotoUpload(e) {
+//   try {
+//     if (!e.postData) throw new Error("No file data");
+
+//     const data = e.parameter;
+//     const base64Data = data.photoData;
+//     if (!base64Data) throw new Error("Missing base64 photo data");
+
+//     const blob = Utilities.base64Decode(base64Data);
+//     const fileBlob = Utilities.newBlob(blob, "image/jpeg", data.fileName || ("complaint_" + Date.now() + ".jpg"));
+
+//     const folder = getOrCreateFolder(DRIVE_FOLDER_NAME);
+//     const file = folder.createFile(fileBlob);
+//     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+//     return sendResponse({
+//       status: "success",
+//       photoUrl: PHOTO_URL_BASE + file.getId(),
+//       message: "Photo uploaded successfully"
+//     });
+
+//   } catch (err) {
+//     Logger.log("❌ handlePhotoUpload error: " + err.message);
+//     return sendResponse({ status: "error", message: err.message });
+//   }
+// }
+
+
+function getOrCreateFolder(name) {
+  const folders = DriveApp.getFoldersByName(name);
+  return folders.hasNext() ? folders.next() : DriveApp.createFolder(name);
+}
+
+// === FORM PARSER ===
+function parseFormData(contents) {
+  const data = {};
+  try {
+    if (!contents || typeof contents !== "string") return data;
+    contents.split("&").forEach(pair => {
+      if (!pair.includes("=")) return;
+      const [k, v] = pair.split("=");
+      data[decodeURIComponent(k)] = decodeURIComponent((v || "").replace(/\+/g, " "));
+    });
+  } catch (err) {
+    Logger.log("parseFormData error: " + err.message);
+  }
+  return data;
+}
+
+// =====================================
+// 📧 Send Email Notification (Admin → User)
+// =====================================
+function sendNotificationEmail(email, name, complaintId, status, notes) {
+  try {
+    if (!email) return { status: "error", message: "No email provided" };
+
+    const subject = `Update on Your Complaint (${complaintId})`;
+    const body = `
+Dear ${name || "Student"},
+
+This is to inform you that the status of your complaint (${complaintId})
+has been updated to: ${status}.
+
+${notes ? "Admin Notes: " + notes + "\n\n" : ""}
+You can track your complaint here:
+https://yourwebsite.com/track.html?id=${complaintId}
+
+Regards,
+University Complaint Management Team
+Pondicherry University
+`;
+
+    // ✅ This line actually sends the email
+    GmailApp.sendEmail(email, subject, body);
+
+    Logger.log(`✅ Email sent successfully to ${email}`);
+    return { status: "success", message: "Email sent successfully" };
+  } catch (err) {
+    Logger.log(`❌ Failed to send email: ${err.message}`);
+    return { status: "error", message: err.message };
+  }
+}
